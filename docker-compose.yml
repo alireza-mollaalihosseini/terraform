@@ -1,0 +1,29 @@
+services:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    ports:
+      - "5000:5000"
+    command: mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root /artifacts --host 0.0.0.0 --port 5000
+    volumes:
+      - ./mlflow_data/db:/mlflow.db  # Persists the SQLite DB (adjust path if needed)
+      - ./mlflow_data/artifacts:/artifacts  # Persists artifacts (models, plots)
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - mlflow
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Change this after first login!
+    volumes:
+      - ./grafana_data:/var/lib/grafana  # Persists dashboards/config
