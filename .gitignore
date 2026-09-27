@@ -13,3 +13,7 @@ crash.*.log
 # OS
 .DS_Store
 Thumbs.db
+
+# Local volumes of the monitoring stack
+mlflow_data/
+grafana_data/
